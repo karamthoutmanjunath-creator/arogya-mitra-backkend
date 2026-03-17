@@ -42,7 +42,11 @@ app.get('/', (_req, res) => {
 // ── Error handler ───────────────────────────────────────────────────
 app.use(errorHandler);
 
-// ── Start ───────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`🩺 Arogya Mitra API running on port ${PORT}`);
-});
+// ── Start / Export ────────────────────────────────────────────────────
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🩺 Arogya Mitra API running on port ${PORT}`);
+  });
+}
+
+module.exports = app;
