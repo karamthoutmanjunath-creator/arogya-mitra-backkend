@@ -23,22 +23,11 @@ router.post('/scan', upload.single('image'), async (req, res, next) => {
     // Parse medicine info from the OCR text
     const medicines = parseMedicines(rawText);
 
-    // Save to database if connected
-    let saved = null;
-    try {
-      const prescription = new Prescription({
-        originalText: rawText,
-        medicines,
-        language: lang
-      });
-      saved = await prescription.save();
-    } catch (dbErr) {
-      console.warn('⚠️  Could not save to DB:', dbErr.message);
-    }
-
+    // We are bypassing MongoDB entirely, so we won't save it.
+    // Just return the OCR text and parsed structured data back to the frontend.
     res.json({
       success: true,
-      id: saved ? saved._id : null,
+      id: Date.now().toString(), // Mock ID
       originalText: rawText,
       medicines,
       language: lang
@@ -50,12 +39,7 @@ router.post('/scan', upload.single('image'), async (req, res, next) => {
 
 // GET /api/prescriptions — List all prescriptions
 router.get('/', async (_req, res, next) => {
-  try {
-    const prescriptions = await Prescription.find().sort({ createdAt: -1 }).limit(50);
-    res.json({ prescriptions });
-  } catch (err) {
-    next(err);
-  }
+  res.json({ prescriptions: [] });
 });
 
 // GET /api/prescriptions/:id — Get one prescription
