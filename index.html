@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mediminder — AI Wellness Companion</title>
+    <meta name="description" content="AI-powered wellness companion for elderly and low-literacy users">
+    <link rel="manifest"
+        href="data:application/json;base64,eyJuYW1lIjoiTWVkaW1pbmRlciIsInNob3J0X25hbWUiOiJNTSIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZWNmZGYzIiwidGhlbWVfY29sb3IjOiIjMTZhMzRhIn0=">
+    <style>
+        :root {
+            --green-600: #16a34a;
+            --green-700: #15803d;
+            --green-800: #166534;
+            --accent: #10b981;
+            --card: #ecfdf5;
+            --muted: #065f46;
+            --safe: #22c55e;
+            --warning: #f59e0b;
+            --critical: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Segoe UI', Inter, Arial, sans-serif;
+            background: linear-gradient(180deg, #ecfdf3 0%, #d1f2e7 100%);
+            color: #06381f;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(180deg, #0f2e1f 0%, #0a1f14 100%);
+            color: #d1fae5;
+        }
+
+        body.dark-mode .block,
+        body.dark-mode .card,
+        body.dark-mode .sym-btn,
+        body.dark-mode .small-card {
+            background: #1a3d2b;
+            color: #d1fae5;
+            border-color: #2d5a42;
+        }
+
+        body.dark-mode header.site-header {
+            background: linear-gradient(90deg, #0f2e1f, #1a3d2b);
+        }
+
+        header.site-header {
+            position: sticky;
+            top: 0;
+            z-index: 9999;
+            background: linear-gradient(90deg, var(--green-700), var(--green-600));
+            color: white;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1
+            }
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .brand:hover {
+            transform: scale(1.05)
+        }
+
+        .brand .logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1)
+            }
+
+            50% {
+                transform: scale(1.05)
+            }
+        }
+
+        .brand h1 {
+            font-size: 19px;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .navlinks {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .navlinks a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navlinks a::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+
+        .navlinks a:hover::before {
+            width: 150px;
+            height: 150px;
+        }
+
+        .navlinks a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        select#language {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.15);
+            color: rgb(0, 0, 0);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        select#language:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.08);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
+        }
+
+        main.container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .hero {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(6, 95, 70, 0.06));
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 12px 35px rgba(3, 60, 26, 0.08);
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg)
+            }
+
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .hero-left {
+            flex: 1;
+            min-width: 300px;
+            z-index: 1;
+        }
+
+        .hero h2 {
+            font-size: 34px;
+            margin: 0 0 14px;
+            color: var(--muted);
+            animation: fadeIn 1s ease-out 0.2s both;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        .hero p {
+            margin: 0 0 24px;
+            color: #264b3a;
+            font-size: 17px;
+            line-height: 1.6;
+            animation: fadeIn 1s ease-out 0.4s both;
+        }
+
+        .cta-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--green-600));
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .btn-primary:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--muted);
+            padding: 12px 22px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ghost:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .hero-right {
+            width: 260px;
+            text-align: center;
+            z-index: 1;
+            animation: fadeIn 1s ease-out 0.8s both;
+        }
+
+        .floating {
+            width: 220px;
+            animation: float 3s ease-in-out infinite;
+            display: inline-block;
+            filter: drop-shadow(0 8px 16px rgba(16, 185, 129, 0.3));
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-15px)
+            }
+        }
+
+        section.block {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 25px rgba(3, 60, 26, 0.06);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        section.block.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .section-title h3 {
+            margin: 0;
+            color: var(--muted);
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .section-title .icon {
+            font-size: 32px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-8px)
+            }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 16px 35px rgba(3, 60, 26, 0.12);
+            border-color: var(--accent);
+        }
+
+        .card .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: inline-block;
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover .icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .card h4 {
+            margin: 12px 0 8px;
+            color: var(--green-800);
+            font-size: 19px;
+        }
+
+        .card p {
+            margin: 0;
+            color: #264b3a;
+            line-height: 1.5;
+            font-size: 15px;
+        }
+
+        .symptom-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .sym-btn {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            font-size: 20px;
+            border: 2px solid #e6fff0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--green-800);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sym-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background: linear-gradient(180deg, transparent, var(--accent));
+            transition: height 0.3s ease;
+            opacity: 0.1;
+        }
+
+        .sym-btn:hover::after {
+            height: 100%;
+        }
+
+        .sym-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 10px 25px rgba(3, 60, 26, 0.1);
+            border-color: var(--accent);
+        }
+
+        .sym-btn:active {
+            transform: scale(0.98);
+        }
+
+        .sym-icon {
+            font-size: 42px;
+        }
+
+        #response {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 19px;
+            font-weight: 600;
+            color: var(--muted);
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.08);
+            border-radius: 12px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .small-card {
+            background: white;
+            padding: 24px 20px;
+            border-radius: 14px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid #e6fff0;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: var(--green-800);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+
+        .small-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(3, 60, 26, 0.12);
+            border-color: var(--accent);
+            background: linear-gradient(135deg, #ffffff, #f0fdf4);
+        }
+
+        .small-card .icon {
+            font-size: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .small-card:hover .icon {
+            transform: scale(1.2) rotate(-5deg);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.3s ease-out;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 35px;
+            border-radius: 20px;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideInDown 0.4s ease-out;
+            position: relative;
+        }
+
+        @keyframes slideInDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1
+            }
+        }
+
+        .modal-content h3 {
+            margin: 0 0 20px;
+            color: var(--green-700);
+            font-size: 24px;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 32px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close:hover {
+            color: #000;
+            background: rgba(0, 0, 0, 0.05);
+            transform: rotate(90deg);
+        }
+
+        .upload-area {
+            border: 3px dashed var(--accent);
+            border-radius: 14px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(16, 185, 129, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+
+        .upload-area:hover {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--green-700);
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .form-group {
+            margin: 16px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--green-800);
+            font-size: 15px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .reminder-list {
+            margin-top: 20px;
+        }
+
+        .reminder-item {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--accent);
+            animation: slideInLeft 0.4s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-30px);
+                opacity: 0
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1
+            }
+        }
+
+        .reminder-item strong {
+            color: var(--green-800);
+            font-size: 16px;
+        }
+
+        .delete-btn {
+            background: var(--critical);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-safe {
+            background: var(--safe)
+        }
+
+        .status-warning {
+            background: var(--warning)
+        }
+
+        .status-critical {
+            background: var(--critical)
+        }
+
+        .ai-assistant {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 9998;
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--green-600));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+            transition: all 0.3s ease;
+            animation: pulse 2s ease-in-out infinite;
+            border: 4px solid white;
+        }
+
+        .avatar:hover {
+            transform: scale(1.15);
+            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5);
+        }
+
+        .chat-bubble {
+            position: absolute;
+            bottom: 85px;
+            right: 0;
+            background: white;
+            padding: 16px 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            max-width: 280px;
+            display: none;
+            animation: fadeInUp 0.4s ease-out;
+            border: 2px solid var(--accent);
+        }
+
+        .chat-bubble.show {
+            display: block;
+        }
+
+        .chat-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 25px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid white;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--green-600));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            animation: shimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 50%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        .chart-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 14px;
+        }
+
+        .bar-chart {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            height: 200px;
+            padding: 10px;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(180deg, var(--accent), var(--green-700));
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            min-width: 40px;
+        }
+
+        .bar:hover {
+            transform: scaleY(1.05);
+            opacity: 0.8;
+        }
+
+        .bar-label {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--green-800);
+        }
+
+        .qr-code {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .qr-code img {
+            width: 180px;
+            height: 180px;
+            border: 4px solid var(--accent);
+            border-radius: 12px;
+            padding: 8px;
+            background: white;
+        }
+
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10001;
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .tutorial-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tutorial-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            text-align: center;
+            animation: scaleIn 0.4s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .tutorial-content h2 {
+            color: var(--green-700);
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .tutorial-content p {
+            font-size: 17px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #264b3a;
+        }
+
+        .tutorial-steps {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .step {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--green-600));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 25px;
+            background: white;
+            padding: 18px 24px;
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            display: none;
+            animation: slideInRight 0.4s ease-out;
+            border-left: 5px solid var(--accent);
+            max-width: 320px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1
+            }
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        .notification .notif-icon {
+            font-size: 28px;
+            display: inline-block;
+            margin-right: 12px;
+        }
+
+        footer.app-footer {
+            margin-top: 30px;
+            padding: 20px;
+            text-align: center;
+            color: #08361f;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 12px 12px 0 0;
+        }
+
+        @media (max-width:768px) {
+            .hero {
+                flex-direction: column;
+                padding: 30px 20px;
+            }
+
+            .hero h2 {
+                font-size: 26px;
+            }
+
+            .hero-right {
+                width: 100%;
+            }
+
+            .floating {
+                width: 160px;
+            }
+
+            .navlinks {
+                order: 2;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                margin: 10% 5%;
+                padding: 25px;
+            }
+
+            .ai-assistant {
+                bottom: 15px;
+                right: 15px;
+            }
+
+            .avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+        }
+
+        @media (min-width:769px) and (max-width:1024px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="brand" onclick="showSection('home')">
+            <div class="logo">🩺</div>
+            <div>
+                <h1>Arogya Mitra</h1>
+                <div style="font-size:12px;opacity:0.95">AI Wellness Companion</div>
+            </div>
+        </div>
+
+        <nav class="navlinks" aria-label="Main Navigation">
+            <a href="#home" onclick="showSection('home')">🏠 Home</a>
+            <a href="#symptom" onclick="showSection('symptom')">🩺 Symptom</a>
+            <a href="#dashboard" onclick="showSection('dashboard')">📊 Dashboard</a>
+        </nav>
+
+        <div class="controls">
+            <select id="language" onchange="updateLanguage()">
+                <option value="en">English</option>
+                <option value="hi">हिंदी</option>
+                <option value="te">తెలుగు</option>
+            </select>
+            <button class="icon-btn" onclick="speakHeader()" title="Listen">🔊</button>
+            <button class="icon-btn" onclick="toggleDarkMode()" title="Dark Mode">🌙</button>
+            <button class="icon-btn" onclick="showTutorial()" title="Tutorial">ℹ️</button>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section id="home" class="hero block visible">
+            <div class="hero-left">
+                <h2>Empowering Wellness Through Smart Understanding</h2>
+                <p>We convert prescriptions into simple, local-language guidance — with big icons, voice support, and
+                    easy
+                    schedules for elders and low-literacy users.</p>
+                <div class="cta-row">
+                    <button class="btn-primary" onclick="showSection('symptom')">🔍 Try Symptom Checker</button>
+                    <button class="btn-ghost" onclick="showSection('dashboard')">📊 Open Dashboard</button>
+                </div>
+            </div>
+            <div class="hero-right">
+                <img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png" class="floating"
+                    alt="Arogya illustration">
+            </div>
+        </section>
+        <section id="symptom" class="block">
+            <div class="section-title">
+                <span class="icon">🩺</span>
+                <h3>Symptom Checker</h3>
+            </div>
+            <p style="text-align:center;color:#255a3f;margin-bottom:20px;font-size:17px">Tap a symptom below and get
+                clear,
+                spoken guidance.</p>
+            <div class="symptom-grid">
+                <button class="sym-btn" onclick="showResponse('fever')">
+                    <span class="sym-icon">🤒</span>
+                    <span>Fever</span>
+                </button>
+                <button class="sym-btn" onclick="showResponse('cough')">
+                    <span class="sym-icon">🤧</span>
+                    <span>Cough</span>
+                </button>
+                <button class="sym-btn" onclick="showResponse('stomach')">
+                    <span class="sym-icon">🤢</span>
+                    <span>Stomach Pain</span>
+                </button>
+                <button class="sym-btn" onclick="showResponse('headache')">
+                    <span class="sym-icon">🤕</span>
+                    <span>Headache</span>
+                </button>
+                <button class="sym-btn" onclick="showResponse('fatigue')">
+                    <span class="sym-icon">😴</span>
+                    <span>Fatigue</span>
+                </button>
+                <button class="sym-btn" onclick="showResponse('dizzy')">
+                    <span class="sym-icon">😵</span>
+                    <span>Dizziness</span>
+                </button>
+            </div>
+            <div id="response"></div>
+        </section>
+
+        <section id="dashboard" class="block">
+            <div class="section-title">
+                <span class="icon">📊</span>
+                <h3>Dashboard — Quick Actions</h3>
+            </div>
+
+            <div class="card-grid">
+                <div class="small-card" onclick="openUploadModal()">
+                    <span class="icon">📷</span>
+                    <span>Upload Prescription</span>
+                </div>
+                <div class="small-card" onclick="openMedicineModal()">
+                    <span class="icon">💊</span>
+                    <span>Medicine Catalog</span>
+                </div>
+                <div class="small-card" onclick="openScheduleModal()">
+                    <span class="icon">🕒</span>
+                    <span>Add Schedule</span>
+                </div>
+                <div class="small-card" onclick="openRemindersModal()">
+                    <span class="icon">🔔</span>
+                    <span>Reminders</span>
+                </div>
+                <div class="small-card" onclick="openSummaryModal()">
+                    <span class="icon">📅</span>
+                    <span>Today's Summary</span>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h4 style="margin:0 0 16px;color:var(--green-800);font-size:20px">📈 Medicine Adherence (Last 7 Days)
+                </h4>
+                <div class="bar-chart">
+                    <div>
+                        <div class="bar" style="height:85%" title="Mon: 85%"></div>
+                        <div class="bar-label">Mon</div>
+                    </div>
+                    <div>
+                        <div class="bar" style="height:90%" title="Tue: 90%"></div>
+                        <div class="bar-label">Tue</div>
+                    </div>
+                    <div>
+                        <div class="bar" style="height:75%" title="Wed: 75%"></div>
+                        <div class="bar-label">Wed</div>
+                    </div>
+                    <div>
+                        <div class="bar" style="height:95%" title="Thu: 95%"></div>
+                        <div class="bar-label">Thu</div>
+                    </div>
+                    <div>
+                        <div class="bar" style="height:88%" title="Fri: 88%"></div>
+                        <div class="bar-label">Fri</div>
+                    </div>
+                    <div>
+                        <div class="bar" style="height:92%" title="Sat: 92%"></div>
+                        <div class="bar-label">Sat</div>
+                    </div>
+                    <div>
+                        <div class="bar" style="height:80%" title="Sun: 80%"></div>
+                        <div class="bar-label">Sun</div>
+                    </div>
+                </div>
+                <div style="text-align:center;margin-top:12px">
+                    <span class="status-indicator status-safe"></span>
+                    <strong style="color:var(--green-800)">Overall: 86% Adherence - Good!</strong>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Upload Prescription Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('uploadModal')">&times;</span>
+            <h3>📷 Upload Prescription</h3>
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div style="font-size:48px;margin-bottom:10px">📄</div>
+                <p style="font-size:17px;margin:0">Click to upload or drag & drop</p>
+                <p style="font-size:14px;color:#666;margin:5px 0 0">Supports: JPG, PNG, PDF</p>
+                <input type="file" id="fileInput" accept="image/*,application/pdf" onchange="handleFileUpload(event)">
+            </div>
+            <div id="uploadResult" style="margin-top:20px;display:none">
+                <h4 style="color:var(--green-700);margin-bottom:10px">✅ Extracted Information:</h4>
+                <div style="background:rgba(16,185,129,0.1);padding:16px;border-radius:10px;text-align:left">
+                    <p><strong>Medicine:</strong> Paracetamol 500mg</p>
+                    <p><strong>Dosage:</strong> 1 tablet, 3 times daily</p>
+                    <p><strong>Duration:</strong> 5 days</p>
+                    <p><strong>Instructions:</strong> Take after meals</p>
+                </div>
+                <button class="btn-primary" style="margin-top:16px;width:100%" onclick="speakExtracted()">🔊 Listen to
+                    Instructions</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medicine Catalog Modal -->
+    <div id="medicineModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('medicineModal')">&times;</span>
+            <h3>💊 Medicine Catalog</h3>
+            <div class="form-group">
+                <input type="text" placeholder="🔍 Search medicine..." oninput="filterMedicines(this.value)">
+            </div>
+            <div id="medicineList" style="max-height:300px;overflow-y:auto">
+                <div class="reminder-item" onclick="speakMedicine('Paracetamol')">
+                    <div>
+                        <strong>💊 Paracetamol 500mg</strong>
+                        <p style="margin:4px 0 0;font-size:14px;color:#666">Pain relief & fever reducer</p>
+                    </div>
+                    <button class="btn-primary" style="padding:8px 16px">Add</button>
+                </div>
+                <div class="reminder-item" onclick="speakMedicine('Amoxicillin')">
+                    <div>
+                        <strong>💊 Amoxicillin 250mg</strong>
+                        <p style="margin:4px 0 0;font-size:14px;color:#666">Antibiotic for infections</p>
+                    </div>
+                    <button class="btn-primary" style="padding:8px 16px">Add</button>
+                </div>
+                <div class="reminder-item" onclick="speakMedicine('Cetirizine')">
+                    <div>
+                        <strong>💊 Cetirizine 10mg</strong>
+                        <p style="margin:4px 0 0;font-size:14px;color:#666">Allergy relief</p>
+                    </div>
+                    <button class="btn-primary" style="padding:8px 16px">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Schedule Modal -->
+    <div id="scheduleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('scheduleModal')">&times;</span>
+            <h3>🕒 Add Medicine Schedule</h3>
+            <form onsubmit="addSchedule(event)">
+                <div class="form-group">
+                    <label>💊 Medicine Name</label>
+                    <input type="text" id="medName" placeholder="Enter medicine name" required>
+                </div>
+                <div class="form-group">
+                    <label>⏰ Time</label>
+                    <input type="time" id="medTime" required>
+                </div>
+                <div class="form-group">
+                    <label>🔁 Frequency</label>
+                    <select id="medFreq">
+                        <option value="daily">Daily</option>
+                        <option value="twice">Twice a day</option>
+                        <option value="thrice">Three times a day</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>🍽️ Meal Timing</label>
+                    <select id="medMeal">
+                        <option value="before">Before meal</option>
+                        <option value="after">After meal</option>
+                        <option value="with">With meal</option>
+                        <option value="empty">Empty stomach</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary" style="width:100%;margin-top:10px">✅ Add Schedule</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reminders Modal -->
+    <div id="remindersModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('remindersModal')">&times;</span>
+            <h3>🔔 Your Reminders</h3>
+            <div class="reminder-list" id="remindersList">
+                <div class="reminder-item">
+                    <div>
+                        <strong>💊 Paracetamol</strong>
+                        <p style="margin:4px 0 0;font-size:14px;color:#666">⏰ 08:00 AM - After breakfast</p>
+                    </div>
+                    <button class="delete-btn" onclick="deleteReminder(this)">🗑️</button>
+                </div>
+                <div class="reminder-item">
+                    <div>
+                        <strong>💊 Vitamin D</strong>
+                        <p style="margin:4px 0 0;font-size:14px;color:#666">⏰ 01:00 PM - After lunch</p>
+                    </div>
+                    <button class="delete-btn" onclick="deleteReminder(this)">🗑️</button>
+                </div>
+                <div class="reminder-item">
+                    <div>
+                        <strong>💊 Blood Pressure Med</strong>
+                        <p style="margin:4px 0 0;font-size:14px;color:#666">⏰ 09:00 PM - Before sleep</p>
+                    </div>
+                    <button class="delete-btn" onclick="deleteReminder(this)">🗑️</button>
+                </div>
+            </div>
+            <button class="btn-primary" style="width:100%;margin-top:16px" onclick="speakAllReminders()">🔊 Listen to
+                All
+                Reminders</button>
+        </div>
+    </div>
+
+    <!-- Summary Modal -->
+    <div id="summaryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('summaryModal')">&times;</span>
+            <h3>📅 Today's Summary</h3>
+            <div
+                style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);padding:20px;border-radius:12px;margin:16px 0">
+                <h4 style="margin:0 0 12px;color:var(--green-800);font-size:20px">Health Status</h4>
+                <p style="margin:8px 0"><span class="status-indicator status-safe"></span><strong>Overall: Good</strong>
+                </p>
+                <p style="margin:8px 0">✅ Medicines Taken: 3/4</p>
+                <p style="margin:8px 0">⏰ Upcoming: 1 at 9:00 PM</p>
+                <p style="margin:8px 0">💪 Adherence Rate: 86%</p>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" style="width:86%"></div>
+            </div>
+            <p style="text-align:center;margin:8px 0;font-size:14px;color:#666">Daily Goal Progress</p>
+
+            <div style="margin-top:20px">
+                <h4 style="margin:0 0 12px;color:var(--green-800)">🔔 Pending Reminders</h4>
+                <div class="reminder-item">
+                    <div>
+                        <strong>💊 Blood Pressure Med</strong>
+                        <p style="margin:4px 0 0;font-size:14px;color:#666">⏰ 09:00 PM - Before sleep</p>
+                    </div>
+                    <span class="status-indicator status-warning"></span>
+                </div>
+            </div>
+
+            <button class="btn-primary" style="width:100%;margin-top:20px" onclick="speakSummary()">🔊 Listen to
+                Summary</button>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qrModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('qrModal')">&times;</span>
+            <h3>📱 Share Your Schedule</h3>
+            <p style="text-align:center;color:#666;margin-bottom:20px">Scan this QR code to download your medicine
+                schedule
+            </p>
+            <div class="qr-code">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://arogyamitra.health/schedule/user123"
+                    alt="QR Code">
+            </div>
+            <p style="text-align:center;margin-top:16px;font-size:15px;color:var(--green-800)">✅ Share with family or
+                caregivers</p>
+            <button class="btn-primary" style="width:100%;margin-top:16px">📧 Email Schedule</button>
+        </div>
+    </div>
+
+    <!-- Tutorial Overlay -->
+    <div id="tutorialOverlay" class="tutorial-overlay">
+        <div class="tutorial-content">
+            <h2>👋 Welcome to Arogya Mitra!</h2>
+            <p>Your personal AI wellness companion. Let us show you how to use this app.</p>
+            <div class="tutorial-steps">
+                <div class="step">1</div>
+                <div class="step">2</div>
+                <div class="step">3</div>
+                <div class="step">4</div>
+            </div>
+            <p><strong>Step 1:</strong> Upload your prescription using the camera icon</p>
+            <p><strong>Step 2:</strong> We'll extract and read it aloud in your language</p>
+            <p><strong>Step 3:</strong> Set reminders for your medicines</p>
+            <p><strong>Step 4:</strong> Track your health progress daily</p>
+            <button class="btn-primary" style="margin-top:20px" onclick="closeTutorial()">🚀 Let's Get Started!</button>
+            <p style="margin-top:16px;font-size:14px;color:#666">
+                <input type="checkbox" id="dontShowAgain" style="width:auto;margin-right:6px">
+                Don't show this again
+            </p>
+        </div>
+    </div>
+
+    <!-- AI Assistant Avatar -->
+    <div class="ai-assistant">
+        <div class="chat-bubble" id="chatBubble">
+            <p style="margin:0;font-size:15px;color:var(--green-800)">Hi! I'm your health assistant. Tap me for help! 👋
+            </p>
+        </div>
+        <div class="avatar" onclick="toggleAssistant()">🤖</div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span class="notif-icon">🔔</span>
+        <span id="notifText">Reminder: Time to take your medicine!</span>
+    </div>
+
+    <footer class="app-footer">
+        © 2025 Arogya Mitra • CBIT Hackathon • Built with ❤️ for accessibility
+    </footer>
+
+    <script>
+        // Global state
+        const API_BASE = 'https://arogya-mitra-backkend.vercel.app/';
+        let currentLang = 'en';
+        let darkMode = false;
+        let assistantOpen = false;
+        let reminders = [];
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initScrollAnimations();
+            checkFirstVisit();
+            loadReminders();
+            showAssistantGreeting();
+
+            // Register service worker for PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('data:text/javascript,');
+            }
+        });
+
+        // Section navigation with smooth scroll
+        function showSection(id) {
+            const sections = document.querySelectorAll('main .block');
+            sections.forEach(el => {
+                if (el.id === id) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        }
+
+        // Scroll-triggered animations
+        function initScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.block').forEach(block => {
+                observer.observe(block);
+            });
+        }
+
+        // Multilingual TTS
+        function speak(text, lang = currentLang) {
+            if (!('speechSynthesis' in window)) {
+                console.warn('TTS not supported');
+                return;
+            }
+
+            const utter = new SpeechSynthesisUtterance(text);
+            const langCode = (lang === 'hi') ? 'hi-IN' : (lang === 'te') ? 'te-IN' : 'en-IN';
+            utter.lang = langCode;
+
+            let voices = window.speechSynthesis.getVoices();
+            const match = voices.find(v => v.lang.toLowerCase().startsWith(langCode.toLowerCase()));
+            if (match) utter.voice = match;
+
+            utter.rate = 0.9;
+            utter.pitch = 1;
+
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utter);
+        }
+
+        // Update language
+        function updateLanguage() {
+            currentLang = document.getElementById('language').value;
+            showNotification(getText('langChanged'));
+        }
+
+        // Get translated text
+        function getText(key) {
+            const translations = {
+                en: {
+                    langChanged: 'Language changed to English',
+                    uploadSuccess: 'Prescription uploaded successfully!',
+                    scheduleAdded: 'Schedule added successfully!',
+                    reminderDeleted: 'Reminder deleted',
+                    medicineTime: 'Time to take your medicine!'
+                },
+                hi: {
+                    langChanged: 'भाषा बदल दी गई है',
+                    uploadSuccess: 'प्रिस्क्रिप्शन सफलतापूर्वक अपलोड की गई!',
+                    scheduleAdded: 'शेड्यूल सफलतापूर्वक जोड़ा गया!',
+                    reminderDeleted: 'रिमाइंडर हटा दिया गया',
+                    medicineTime: 'दवा लेने का समय!'
+                },
+                te: {
+                    langChanged: 'భాష మార్చబడింది',
+                    uploadSuccess: 'ప్రిస్క్రిప్షన్ విజయవంతంగా అప్‌లోడ్ చేయబడింది!',
+                    scheduleAdded: 'షెడ్యూల్ విజయవంతంగా జోడించబడింది!',
+                    reminderDeleted: 'రిమైండర్ తొలగించబడింది',
+                    medicineTime: 'మందు తీసుకునే సమయం!'
+                }
+            };
+
+            return translations[currentLang][key] || translations.en[key];
+        }
+
+        // Header voice
+        function speakHeader() {
+            let text = '';
+            if (currentLang === 'en') text = 'Welcome to Arogya Mitra! Your AI wellness companion.';
+            else if (currentLang === 'hi') text = 'आपका स्वागत है आरोग्य मित्र में! आपका एआई स्वास्थ्य साथी।';
+            else if (currentLang === 'te') text = 'ఆరోగ్య మిత్రంకు స్వాగతం! మీ ఏఐ ఆరోగ్య సహచరుడు.';
+            speak(text);
+        }
+
+        // Speak card content
+        function speakCard(text) {
+            speak(text);
+        }
+
+        // Symptom checker
+        function showResponse(symptom) {
+            const responses = {
+                en: {
+                    fever: '🤒 You may have a mild fever. Drink plenty of fluids, rest, and monitor temperature. Consult doctor if it persists.',
+                    cough: '🤧 For cough, try warm steam and honey. Seek medical attention if cough is severe or persists.',
+                    stomach: '🤢 Stomach pain — avoid heavy meals, stay hydrated. Consult doctor if severe or blood present.',
+                    headache: '🤕 Mild headache — rest in quiet place, drink water. See doctor if severe or frequent.',
+                    fatigue: '😴 Feeling tired? Ensure good sleep, balanced diet, and hydration. Consult if chronic.',
+                    dizzy: '😵 Dizziness can indicate low BP or dehydration. Sit down, drink water. See doctor if persists.'
+                },
+                hi: {
+                    fever: '🤒 आपको हल्का बुखार हो सकता है। पर्याप्त पानी पिएँ, आराम करें। गंभीर होने पर डॉक्टर से मिलें।',
+                    cough: '🤧 खांसी के लिए भाप और शहद लें। गंभीर होने पर डॉक्टर से मिलें।',
+                    stomach: '🤢 पेट दर्द — भारी भोजन से बचें, हाइड्रेटेड रहें। गंभीर होने पर डॉक्टर से मिलें।',
+                    headache: '🤕 हल्का सिरदर्द — शांत जगह पर आराम करें, पानी पीएँ। गंभीर होने पर डॉक्टर से मिलें।',
+                    fatigue: '😴 थकान महसूस हो रही है? अच्छी नींद लें, संतुलित आहार लें। पुरानी हो तो डॉक्टर से मिलें।',
+                    dizzy: '😵 चक्कर आना कम बीपी या डिहाइड्रेशन का संकेत हो सकता है। बैठें, पानी पिएँ।'
+                },
+                te: {
+                    fever: '🤒 మీకు తక్కువ జ్వరం ఉండవచ్చు। సరిపడా ద్రవాలు త్రాగండి, విశ్రాంతి తీసుకోండి।',
+                    cough: '🤧 జలుబు కోసం వేడి ఆవిరి, తేనె త్రాగండి। తీవ్రమైతే డాక్టర్‌ను సంప్రదించండి।',
+                    stomach: '🤢 పొట్ట నొప్పి — భారం తినకుండా ఉండండి, సరిపడా ద్రవాలు త్రాగండి।',
+                    headache: '🤕 తక్కువ తలనొప్పి — ప్రశాంత స్థలంలో విశ్రాంతి తీసుకోండి, నీరు త్రాగండి।',
+                    fatigue: '😴 అలసట అనుభూతి? మంచి నిద్ర, సమతుల ఆహారం తీసుకోండి।',
+                    dizzy: '😵 తల తిరగడం తక్కువ BP లేదా నిర్జలీకరణను సూచించవచ్చు। కూర్చోండి, నీళ్లు త్రాగండి।'
+                }
+            };
+
+            const msg = responses[currentLang][symptom];
+            document.getElementById('response').innerText = msg;
+            speak(msg);
+        }
+
+        // Modal functions
+        function openUploadModal() {
+            document.getElementById('uploadModal').style.display = 'block';
+            speak(currentLang === 'hi' ? 'प्रिस्क्रिप्शन अपलोड करें' :
+                currentLang === 'te' ? 'ప్రిస్క్రిప్షన్ అప్‌లోడ్ చేయండి' :
+                    'Upload your prescription');
+        }
+
+        function openMedicineModal() {
+            document.getElementById('medicineModal').style.display = 'block';
+            speak(currentLang === 'hi' ? 'दवा कैटलॉग' :
+                currentLang === 'te' ? 'మందుల జాబితా' :
+                    'Medicine catalog');
+        }
+
+        function openScheduleModal() {
+            document.getElementById('scheduleModal').style.display = 'block';
+            speak(currentLang === 'hi' ? 'शेड्यूल जोड़ें' :
+                currentLang === 'te' ? 'షెడ్యూల్ జోడించండి' :
+                    'Add schedule');
+        }
+
+        function openRemindersModal() {
+            document.getElementById('remindersModal').style.display = 'block';
+            speak(currentLang === 'hi' ? 'आपके रिमाइंडर' :
+                currentLang === 'te' ? 'మీ రిమైండర్లు' :
+                    'Your reminders');
+        }
+
+        function openSummaryModal() {
+            document.getElementById('summaryModal').style.display = 'block';
+            speak(currentLang === 'hi' ? 'आज का सारांश' :
+                currentLang === 'te' ? 'ఈరోజు సారాంశం' :
+                    'Todays summary');
+        }
+
+        function openQRModal() {
+            document.getElementById('qrModal').style.display = 'block';
+            speak(currentLang === 'hi' ? 'क्यूआर कोड शेयर करें' :
+                currentLang === 'te' ? 'క్యూఆర్ కోడ్ షేర్ చేయండి' :
+                    'Share QR code');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal on outside click
+        window.onclick = function (event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // File upload handler (STATIC DEMO FOR PRESENTATION)
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const resultBox = document.getElementById('uploadResult');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `
+        <div style="text-align:center;padding:30px;">
+          <div style="font-size:50px;margin-bottom:15px;animation:pulse 1s infinite">🔬</div>
+          <p style="color:var(--green-700);font-weight:600;font-size:18px">AI is analyzing your prescription...</p>
+          <div style="width:100%;height:4px;background:#eee;border-radius:2px;margin-top:15px;overflow:hidden">
+            <div style="width:0%;height:100%;background:var(--accent);animation:loadProgress 2.5s forwards"></div>
+          </div>
+        </div>
+        <style>
+          @keyframes loadProgress { to { width: 100%; } }
+        </style>
+      `;
+
+            // Simulation delay for the demo
+            setTimeout(() => {
+                resultBox.innerHTML = `
+          <div style="animation:fadeInUp 0.5s ease-out">
+            <h4 style="color:var(--green-700);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+              <span style="font-size:24px">✅</span> Extraction Successful
+            </h4>
+            
+            <div style="background:white;padding:20px;border-radius:12px;border:1px solid rgba(16,185,129,0.2);text-align:left;font-size:15px;line-height:1.6;box-shadow:0 4px 15px rgba(0,0,0,0.05)">
+              <div style="margin-bottom:15px;padding-bottom:12px;border-bottom:1px solid rgba(0,0,0,0.05)">
+                <strong style="color:var(--green-800);display:block;font-size:20px">💊 Amoxicillin 500mg</strong>
+                <span style="color:#666;font-size:14px">Broad-spectrum Antibiotic</span>
+              </div>
+              
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px">
+                <div>
+                  <span style="color:#666;font-size:13px;display:block">⏰ Timing</span>
+                  <strong>3 times a day</strong>
+                </div>
+                <div>
+                  <span style="color:#666;font-size:13px;display:block">🍽️ Meal Info</span>
+                  <strong>After meals</strong>
+                </div>
+                <div>
+                  <span style="color:#666;font-size:13px;display:block">📅 Duration</span>
+                  <strong>5 Days</strong>
+                </div>
+                <div>
+                  <span style="color:#666;font-size:13px;display:block">💧 Usage</span>
+                  <strong>With water</strong>
+                </div>
+              </div>
+
+              <div style="background:rgba(245,158,11,0.05);padding:12px;border-radius:8px;border-left:4px solid var(--warning);margin-bottom:15px">
+                <strong style="font-size:13px;color:var(--warning)">⚠️ Related Medications & Precautions:</strong>
+                <p style="font-size:13px;margin-top:5px;color:#555">
+                  • <strong>Related:</strong> Azithromycin, Cefuroxime (similar antibiotics).<br>
+                  • <strong>Wait:</strong> Complete full 5-day course even if feeling better.<br>
+                  • <strong>Side effects:</strong> Mild nausea or diarrhea may occur.
+                </p>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:20px">
+              <button class="btn-primary" style="flex:2;height:50px;font-size:16px" onclick="speakExtracted()">🔊 Listen</button>
+              <button class="btn-ghost" style="flex:3" onclick="openScheduleModal()">🕒 Create Reminder</button>
+            </div>
+            
+            <p style="text-align:center;margin-top:15px;font-size:12px;color:#999">
+              *Demo data provided for presentation purposes.
+            </p>
+          </div>
+        `;
+
+                showNotification(getText('uploadSuccess'));
+                speak(getText('uploadSuccess'));
+
+                // Pre-fill the schedule form
+                const nameInput = document.getElementById('medName');
+                if (nameInput) nameInput.value = 'Amoxicillin 500mg';
+
+                const timeInput = document.getElementById('medTime');
+                if (timeInput) timeInput.value = '08:00';
+
+                const freqInput = document.getElementById('medFreq');
+                if (freqInput) freqInput.value = 'thrice';
+
+                const mealInput = document.getElementById('medMeal');
+                if (mealInput) mealInput.value = 'after';
+
+            }, 2500);
+        }
+
+        function speakExtracted() {
+            const texts = {
+                hi: 'एमोक्सिसिलिन पांच सौ मिलीग्राम की पहचान की गई है। दिन में तीन बार, खाने के बाद लें। संबंधित दवाएं एज़िथ्रोमाइसिन और सेफ्यूरोक्सीम हैं। कृपया पूरा पाँच दिन का कोर्स करें।',
+                te: 'అమోక్సిసిల్లిన్ ఐదు వందల మిల్లీగ్రాములు గుర్తించబడింది. రోజుకు మూడు సార్లు, భోజనం తర్వాత తీసుకోండి. సంబంధిత మందులు అజిత్రోమైసిన్ మరియు సెఫురోక్సిమ్. దయచేసి పూర్తి ఐదు రోజుల కోర్సును పూర్తి చేయండి.',
+                en: 'Amoxicillin five hundred milligrams identified. Take three times daily after meals. Related medications include Azithromycin and Cefuroxime. Please complete the full five-day course.'
+            };
+            speak(texts[currentLang]);
+        }
+
+        // Medicine catalog
+        function filterMedicines(query) {
+            // Simple filter simulation
+            const items = document.querySelectorAll('#medicineList .reminder-item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query.toLowerCase()) ? 'flex' : 'none';
+            });
+        }
+
+        function speakMedicine(name) {
+            const info = {
+                Paracetamol: {
+                    en: 'Paracetamol 500mg. Used for pain relief and fever reduction.',
+                    hi: 'पैरासिटामोल पांच सौ मिलीग्राम। दर्द और बुखार कम करने के लिए।',
+                    te: 'పారాసిటమాల్ ఐదు వందల మిల్లీగ్రాములు. నొప్పి మరియు జ్వరం తగ్గించడానికి.'
+                },
+                Amoxicillin: {
+                    en: 'Amoxicillin 250mg. Antibiotic for bacterial infections.',
+                    hi: 'एमोक्सिसिलिन दो सौ पचास मिलीग्राम। बैक्टीरियल संक्रमण के लिए।',
+                    te: 'అమోక్సిసిల్లిన్ రెండు వందల యాభై మిల్లీగ్రాములు. బ్యాక్టీరియా ఇన్ఫెక్షన్ కోసం.'
+                },
+                Cetirizine: {
+                    en: 'Cetirizine 10mg. For allergy relief and antihistamine.',
+                    hi: 'सेटीरीज़ीन दस मिलीग्राम। एलर्जी राहत के लिए।',
+                    te: 'సెటిరిజైన్ పది మిల్లీగ్రాములు. అలెర్జీ ఉపశమనం కోసం.'
+                }
+            };
+
+            if (info[name]) {
+                speak(info[name][currentLang]);
+            }
+        }
+
+        // Schedule management
+        function addSchedule(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('medName').value;
+            const time = document.getElementById('medTime').value;
+            const freq = document.getElementById('medFreq').value;
+            const meal = document.getElementById('medMeal').value;
+
+            // Create reminder object
+            const reminder = { name, time, freq, meal };
+            reminders.push(reminder);
+            saveReminders();
+
+            // Add to reminder list
+            const list = document.getElementById('remindersList');
+            const item = document.createElement('div');
+            item.className = 'reminder-item';
+            item.innerHTML = `
+    <div>
+      <strong>💊 ${name}</strong>
+      <p style="margin:4px 0 0;font-size:14px;color:#666">⏰ ${time} - ${getMealText(meal)}</p>
+    </div>
+    <button class="delete-btn" onclick="deleteReminder(this)">🗑️</button>
+  `;
+            list.appendChild(item);
+
+            closeModal('scheduleModal');
+            showNotification(getText('scheduleAdded'));
+
+            // Speak confirmation
+            const confirmText = currentLang === 'hi' ?
+                `${name} के लिए ${time} बजे रिमाइंडर जोड़ा गया` :
+                currentLang === 'te' ?
+                    `${name} కోసం ${time} కి రిమైండర్ జోడించబడింది` :
+                    `Reminder added for ${name} at ${time}`;
+            speak(confirmText);
+
+            // Reset form
+            event.target.reset();
+        }
+
+        function getMealText(meal) {
+            const texts = {
+                before: { en: 'Before meal', hi: 'खाने से पहले', te: 'భోజనానికి ముందు' },
+                after: { en: 'After meal', hi: 'खाने के बाद', te: 'భోజనం తర్వాత' },
+                with: { en: 'With meal', hi: 'खाने के साथ', te: 'భోజనంతో' },
+                empty: { en: 'Empty stomach', hi: 'खाली पेट', te: 'ఖాళీ కడుపుతో' }
+            };
+            return texts[meal][currentLang];
+        }
+
+        function deleteReminder(btn) {
+            btn.parentElement.remove();
+            showNotification(getText('reminderDeleted'));
+            speak(getText('reminderDeleted'));
+        }
+
+        function speakAllReminders() {
+            const items = document.querySelectorAll('#remindersList .reminder-item');
+            let text = currentLang === 'hi' ? 'आपके रिमाइंडर: ' :
+                currentLang === 'te' ? 'మీ రిమైండర్లు: ' :
+                    'Your reminders: ';
+
+            items.forEach((item, index) => {
+                const name = item.querySelector('strong').textContent;
+                const time = item.querySelector('p').textContent;
+                text += `${index + 1}. ${name} ${time}. `;
+            });
+
+            speak(text);
+        }
+
+        function speakSummary() {
+            const text = currentLang === 'hi' ?
+                'आज का सारांश: तीन दवाएं ली गईं, एक बाकी है। आपकी पालन दर छियासी प्रतिशत है। अच्छा काम!' :
+                currentLang === 'te' ?
+                    'ఈరోజు సారాంశం: మూడు మందులు తీసుకున్నారు, ఒకటి మిగిలి ఉంది. మీ అనుసరణ రేటు ఎనభై ఆరు శాతం. మంచి పని!' :
+                    'Todays summary: Three medicines taken, one pending. Your adherence rate is eighty-six percent. Good job!';
+            speak(text);
+        }
+
+        // Dark mode
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            document.body.classList.toggle('dark-mode');
+            const icon = darkMode ? '☀️' : '🌙';
+            event.target.textContent = icon;
+
+            const text = darkMode ?
+                (currentLang === 'hi' ? 'डार्क मोड चालू' : currentLang === 'te' ? 'డార్క్ మోడ్ ఆన్' : 'Dark mode enabled') :
+                (currentLang === 'hi' ? 'लाइट मोड चालू' : currentLang === 'te' ? 'లైట్ మోడ్ ఆన్' : 'Light mode enabled');
+            showNotification(text);
+        }
+
+        // Tutorial
+        function showTutorial() {
+            document.getElementById('tutorialOverlay').classList.add('show');
+            speak(currentLang === 'hi' ?
+                'आरोग्य मित्र में आपका स्वागत है। हम आपको ऐप का उपयोग करना सिखाएंगे।' :
+                currentLang === 'te' ?
+                    'ఆరోగ్య మిత్రంకు స్వాగతం. మేము యాప్‌ను ఉపయోగించడం మీకు నేర్పుతాము.' :
+                    'Welcome to Arogya Mitra. Let us show you how to use this app.');
+        }
+
+        function closeTutorial() {
+            document.getElementById('tutorialOverlay').classList.remove('show');
+            if (document.getElementById('dontShowAgain').checked) {
+                localStorage.setItem('tutorialSeen', 'true');
+            }
+        }
+
+        function checkFirstVisit() {
+            const seen = localStorage.getItem('tutorialSeen');
+            if (!seen) {
+                setTimeout(() => showTutorial(), 2000);
+            }
+        }
+
+        // AI Assistant
+        function toggleAssistant() {
+            assistantOpen = !assistantOpen;
+            const bubble = document.getElementById('chatBubble');
+
+            if (assistantOpen) {
+                bubble.classList.add('show');
+                const text = currentLang === 'hi' ?
+                    'नमस्ते! मैं आपकी स्वास्थ्य सहायक हूं। मैं आपकी कैसे मदद कर सकती हूं?' :
+                    currentLang === 'te' ?
+                        'హలో! నేను మీ ఆరోగ్య సహాయకుడను. నేను మీకు ఎలా సహాయం చేయగలను?' :
+                        'Hi! I am your health assistant. How can I help you?';
+                speak(text);
+            } else {
+                bubble.classList.remove('show');
+            }
+        }
+
+        function showAssistantGreeting() {
+            setTimeout(() => {
+                document.getElementById('chatBubble').classList.add('show');
+                setTimeout(() => {
+                    document.getElementById('chatBubble').classList.remove('show');
+                }, 5000);
+            }, 3000);
+        }
+
+        // Notifications
+        function showNotification(text) {
+            const notif = document.getElementById('notification');
+            document.getElementById('notifText').textContent = text;
+            notif.classList.add('show');
+
+            setTimeout(() => {
+                notif.classList.remove('show');
+            }, 4000);
+        }
+
+        // Simulate medicine reminder
+        function simulateReminder() {
+            showNotification(getText('medicineTime'));
+            speak(getText('medicineTime'));
+        }
+
+        // Storage functions
+        function saveReminders() {
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+        }
+
+        function loadReminders() {
+            const stored = localStorage.getItem('reminders');
+            if (stored) {
+                reminders = JSON.parse(stored);
+            }
+        }
+
+        // Voice synthesis ready
+        window.speechSynthesis.onvoiceschanged = () => {
+            console.log('Voices loaded:', window.speechSynthesis.getVoices().length);
+        };
+
+        // Simulate periodic reminder (demo)
+        setInterval(() => {
+            const now = new Date();
+            const hour = now.getHours();
+
+            // Demo: Show reminder at specific hours
+            if (hour === 8 || hour === 13 || hour === 20) {
+                const minutes = now.getMinutes();
+                if (minutes === 0) {
+                    simulateReminder();
+                }
+            }
+        }, 60000); // Check every minute
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Alt + H for home
+            if (e.altKey && e.key === 'h') {
+                showSection('home');
+            }
+            // Alt + S for symptom checker
+            if (e.altKey && e.key === 's') {
+                showSection('symptom');
+            }
+            // Alt + D for dashboard
+            if (e.altKey && e.key === 'd') {
+                showSection('dashboard');
+            }
+            // Alt + V for voice
+            if (e.altKey && e.key === 'v') {
+                speakHeader();
+            }
+            // Escape to close modals
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+                document.getElementById('tutorialOverlay').classList.remove('show');
+            }
+        });
+
+        // Add ripple effect to buttons
+        document.addEventListener('click', function (e) {
+            if (e.target.matches('.btn-primary, .btn-ghost, .sym-btn, .small-card')) {
+                const ripple = document.createElement('span');
+                ripple.style.position = 'absolute';
+                ripple.style.width = '20px';
+                ripple.style.height = '20px';
+                ripple.style.background = 'rgba(255,255,255,0.6)';
+                ripple.style.borderRadius = '50%';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s ease-out';
+                ripple.style.pointerEvents = 'none';
+
+                const rect = e.target.getBoundingClientRect();
+                ripple.style.left = (e.clientX - rect.left) + 'px';
+                ripple.style.top = (e.clientY - rect.top) + 'px';
+
+                e.target.style.position = 'relative';
+                e.target.style.overflow = 'hidden';
+                e.target.appendChild(ripple);
+
+                setTimeout(() => ripple.remove(), 600);
+            }
+        });
+
+        // Add ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+  @keyframes ripple {
+    to {
+      transform: scale(15);
+      opacity: 0;
+    }
+  }
+`;
+        document.head.appendChild(style);
+
+        // PWA Install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Show install button or notification
+            const installText = currentLang === 'hi' ?
+                'ऐप इंस्टॉल करें: ऑफलाइन उपयोग के लिए Arogya Mitra डाउनलोड करें' :
+                currentLang === 'te' ?
+                    'యాప్ ఇన్‌స్టాల్ చేయండి: ఆఫ్‌లైన్ ఉపయోగం కోసం ఆరోగ్య మిత్రంను డౌన్‌లోడ్ చేయండి' :
+                    'Install App: Download Arogya Mitra for offline use';
+
+            setTimeout(() => {
+                if (confirm(installText)) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        deferredPrompt = null;
+                    });
+                }
+            }, 5000);
+        });
+
+        // Performance optimization: Lazy load images
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                            img.removeAttribute('data-src');
+                            imageObserver.unobserve(img);
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('img[data-src]').forEach(img => {
+                imageObserver.observe(img);
+            });
+        }
+
+        // Accessibility: Announce page changes for screen readers
+        function announcePageChange(section) {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('role', 'status');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.style.position = 'absolute';
+            announcement.style.left = '-10000px';
+            announcement.textContent = `Navigated to ${section} section`;
+            document.body.appendChild(announcement);
+
+            setTimeout(() => announcement.remove(), 1000);
+        }
+
+        // Initialize bar chart hover effects
+        document.querySelectorAll('.bar').forEach(bar => {
+            bar.addEventListener('mouseenter', function () {
+                const value = this.title;
+                speak(value);
+            });
+        });
+
+        // Console welcome message
+        console.log('%c🩺 Arogya Mitra - AI Wellness Companion', 'color: #16a34a; font-size: 20px; font-weight: bold;');
+        console.log('%cBuilt for CBIT Hackathon 2025', 'color: #10b981; font-size: 14px;');
+        console.log('%cKeyboard shortcuts: Alt+H (Home), Alt+S (Symptom), Alt+D (Dashboard), Alt+V (Voice)', 'color: #666; font-size: 12px;');
+
+        // Analytics (mock)
+        function trackEvent(category, action, label) {
+            console.log(`Event: ${category} - ${action} - ${label}`);
+        }
+
+        // Track section views
+        const originalShowSection = showSection;
+        showSection = function (id) {
+            originalShowSection(id);
+            trackEvent('Navigation', 'Section View', id);
+            announcePageChange(id);
+        };
+    </script>
+
+</body>
+
+</html>
