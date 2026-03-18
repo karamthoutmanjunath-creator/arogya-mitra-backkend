@@ -27,7 +27,7 @@ app.use('/api/schedules',     require('./routes/schedules'));
 // ── Root ────────────────────────────────────────────────────────────
 app.get('/', (_req, res) => {
   res.json({
-    name: 'Arogya Mitra API',
+    name: 'Mediminder API',
     version: '1.0.0',
     docs: {
       health:        'GET  /api/health',
@@ -45,7 +45,7 @@ app.use(errorHandler);
 // ── Start / Export ────────────────────────────────────────────────────
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
-    console.log(`🩺 Arogya Mitra API running on port ${PORT}`);
+    console.log(`🩺 Mediminder API running on port ${PORT}`);
   });
 }
 

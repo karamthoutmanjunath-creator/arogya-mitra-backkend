@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: arogya-mitra-api
+    name: mediminder-api
     runtime: node
     plan: free
     buildCommand: npm install

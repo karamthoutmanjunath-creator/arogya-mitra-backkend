@@ -1,7 +1,7 @@
 {
-  "name": "arogya-mitra-backend",
+  "name": "mediminder-backend",
   "version": "1.0.0",
-  "description": "Backend API server for Arogya Mitra — AI Wellness Companion",
+  "description": "Backend API server for Mediminder — AI Wellness Companion",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
